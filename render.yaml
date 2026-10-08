@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aura-store-ecommerce
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: API_KEY
+        value: aura_store_api_key_sec_987654321_x
+      - key: DB_TYPE
+        value: sqlite

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const db = require('./config/db');
@@ -30,7 +31,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reports', reportRoutes);
 
-// Base route test
+// Base API route test
 app.get('/api', (req, res) => {
   res.json({
     message: 'Welcome to Aura Store REST API',
@@ -46,13 +47,27 @@ app.get('/api', (req, res) => {
   });
 });
 
+// Serve compiled React frontend in production / single-port mode
+const frontendDistPath = path.join(__dirname, '..', 'frontend', 'dist');
+if (fs.existsSync(frontendDistPath)) {
+  console.log(`📦 Serving compiled React frontend from ${frontendDistPath}`);
+  app.use(express.static(frontendDistPath));
+
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/images')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
 // Central Error Handler Middleware
 app.use(errorHandler);
 
 // Initialize DB and start server
 db.initDb().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 Express REST API server running at http://localhost:${PORT}`);
+    console.log(`🚀 Express Full-Stack Server running at http://localhost:${PORT}`);
     console.log(`📊 Active DB Engine: ${db.getMode().toUpperCase()}`);
     console.log(`🔐 API Key Security: ${process.env.API_KEY ? 'ENABLED' : 'DISABLED'}`);
   });
