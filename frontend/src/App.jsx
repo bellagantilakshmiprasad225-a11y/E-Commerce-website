@@ -12,6 +12,8 @@ import OwnerAuthModal from './components/OwnerAuthModal';
 import Footer from './components/Footer';
 import { CheckCircle2 } from 'lucide-react';
 
+const API_KEY = import.meta.env.VITE_API_KEY || 'aura_store_api_key_sec_987654321_x';
+
 function App() {
   const [activeTab, setActiveTab] = useState('storefront'); // 'storefront' | 'reports'
 
@@ -68,10 +70,12 @@ function App() {
     showToast('Logged out of Owner Portal');
   };
 
-  // Fetch Categories
+  // Fetch Categories with API key header
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories');
+      const res = await fetch('/api/categories', {
+        headers: { 'x-api-key': API_KEY }
+      });
       const json = await res.json();
       if (json.success) {
         setCategories(json.data);
@@ -81,7 +85,7 @@ function App() {
     }
   };
 
-  // Fetch Products
+  // Fetch Products with API key header
   const fetchProducts = async () => {
     setLoading(true);
     setError(null);
@@ -98,7 +102,9 @@ function App() {
         url += '?' + queryParams.join('&');
       }
 
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: { 'x-api-key': API_KEY }
+      });
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.error?.message || 'Failed to fetch products');
@@ -170,7 +176,9 @@ function App() {
   // Fetch invoice by order ID for reports invoice modal view
   const handleViewInvoiceById = async (orderId) => {
     try {
-      const res = await fetch(`/api/orders/${orderId}`);
+      const res = await fetch(`/api/orders/${orderId}`, {
+        headers: { 'x-api-key': API_KEY }
+      });
       const json = await res.json();
       if (json.success) {
         setActiveInvoice(json.data);

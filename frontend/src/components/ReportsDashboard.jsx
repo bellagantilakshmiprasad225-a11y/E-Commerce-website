@@ -12,7 +12,10 @@ const ReportsDashboard = ({ onViewInvoice }) => {
     setError(null);
 
     try {
-      const response = await fetch('/api/reports/sales');
+      const API_KEY = import.meta.env.VITE_API_KEY || 'aura_store_api_key_sec_987654321_x';
+      const response = await fetch('/api/reports/sales', {
+        headers: { 'x-api-key': API_KEY }
+      });
       const json = await response.json();
 
       if (!response.ok || !json.success) {

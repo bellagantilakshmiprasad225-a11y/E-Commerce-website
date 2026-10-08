@@ -8,17 +8,21 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const apiKeyMiddleware = require('./middleware/apiKeyMiddleware');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS & Middleware
+// CORS & Body Parser
 app.use(cors());
 app.use(express.json());
 
-// Serve static images if present in frontend public or local uploads
+// Serve static images
 app.use('/images', express.static(path.join(__dirname, '..', 'frontend', 'public', 'images')));
+
+// Protect all /api endpoints with API Key Middleware
+app.use('/api', apiKeyMiddleware);
 
 // API Routes
 app.use('/api/categories', categoryRoutes);
@@ -29,7 +33,7 @@ app.use('/api/reports', reportRoutes);
 // Base route test
 app.get('/api', (req, res) => {
   res.json({
-    message: 'Welcome to Simple E-Commerce Cart & Order Management API',
+    message: 'Welcome to Aura Store REST API',
     database_mode: db.getMode(),
     endpoints: {
       categories: '/api/categories',
@@ -50,6 +54,7 @@ db.initDb().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Express REST API server running at http://localhost:${PORT}`);
     console.log(`📊 Active DB Engine: ${db.getMode().toUpperCase()}`);
+    console.log(`🔐 API Key Security: ${process.env.API_KEY ? 'ENABLED' : 'DISABLED'}`);
   });
 }).catch(err => {
   console.error('Failed to initialize database:', err);

@@ -46,9 +46,14 @@ const CheckoutModal = ({
         }))
       };
 
+      const API_KEY = import.meta.env.VITE_API_KEY || 'aura_store_api_key_sec_987654321_x';
+
       const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY
+        },
         body: JSON.stringify(orderPayload)
       });
 
